@@ -11,7 +11,10 @@
 #define L2 200
 #define M1 10
 #define M2 15
-#define G 1000.0f
+#define G 9.81f
+#define TIME_SCALE 10.0f
+#define PHYSICS_SUBSTEPS 4
+#define DAMPING_PER_SECOND 0.01f
 
 float l1, l2, phi1, phi2, phi1_d, phi2_d, phi1_dd, phi2_dd, m1, m2;
 
@@ -53,20 +56,24 @@ void initSolver(void)
     m2 = M2;
 }
 
-void step(void)
+void step(float dt)
 {
+    float damping = fmaxf(0.0f, 1.0f - DAMPING_PER_SECOND * dt);
+
     // Angular acceleration
     phi1_dd = (-G * (2 * m1 + m2) * sinf(phi1) - m2 * G * sinf(phi1 - 2 * phi2) - 2 * sinf(phi1 - phi2) * m2 * (phi2_d * phi2_d * l2 + phi1_d * phi1_d * l1 * cosf(phi1 - phi2))) / (l1 * (2 * m1 + m2 - m2 * cosf(2 * phi1 - 2 * phi2)));
 
     phi2_dd = (2 * sinf(phi1 - phi2) * (phi1_d * phi1_d * l1 * (m1 + m2) + G * (m1 + m2) * cosf(phi1) + phi2_d * phi2_d * l2 * m2 * cosf(phi1 - phi2))) / (l2 * (2 * m1 + m2 - m2 * cosf(2 * phi1 - 2 * phi2)));
 
     // Angular velocity
-    phi1_d += phi1_dd * GetFrameTime();
-    phi2_d += phi2_dd * GetFrameTime();
+    phi1_d += phi1_dd * dt;
+    phi2_d += phi2_dd * dt;
+    phi1_d *= damping;
+    phi2_d *= damping;
 
     // Angle
-    phi1 += phi1_d * GetFrameTime();
-    phi2 += phi2_d * GetFrameTime();
+    phi1 += phi1_d * dt;
+    phi2 += phi2_d * dt;
 }
 
 int main(void)
@@ -78,10 +85,16 @@ int main(void)
 
     while (!WindowShouldClose())
     {
+        float dt = (GetFrameTime() * TIME_SCALE) / PHYSICS_SUBSTEPS;
+
+        for (int i = 0; i < PHYSICS_SUBSTEPS; i++)
+        {
+            step(dt);
+        }
+
         BeginDrawing();
 
         drawDoublePendulum(phi1, phi2, l1, l2, (Vector2){WIDTH / 2, 0});
-        step();
 
         ClearBackground(BLACK);
         EndDrawing();
