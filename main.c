@@ -18,6 +18,13 @@
 
 float l1, l2, phi1, phi2, phi1_d, phi2_d, phi1_dd, phi2_dd, m1, m2;
 
+typedef enum
+{
+    DRAG_NONE,
+    DRAG_PHI1,
+    DRAG_PHI2,
+} DragTarget;
+
 Vector2 getPivot(float angle, float length, Vector2 pivot)
 {
     Vector2 newPivot;
@@ -83,20 +90,79 @@ int main(void)
 
     initSolver();
 
+    bool isRunning = true;
+    DragTarget dragTarget = DRAG_NONE;
+    Vector2 originPivot = (Vector2){WIDTH / 2, 0};
+
     while (!WindowShouldClose())
     {
-        float dt = (GetFrameTime() * TIME_SCALE) / PHYSICS_SUBSTEPS;
-
-        for (int i = 0; i < PHYSICS_SUBSTEPS; i++)
+        if (IsKeyPressed(KEY_SPACE))
         {
-            step(dt);
+            isRunning = !isRunning;
+            dragTarget = DRAG_NONE;
+        }
+
+        Vector2 pivot1 = getPivot(phi1, l1, originPivot);
+        Vector2 bob1 = pivot1;
+        Vector2 bob2 = getPivot(phi2, l2, pivot1);
+        Vector2 mousePos = GetMousePosition();
+
+        if (!isRunning)
+        {
+            if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+            {
+                if (CheckCollisionPointCircle(mousePos, bob2, BALL_RADIUS))
+                {
+                    dragTarget = DRAG_PHI2;
+                }
+                else if (CheckCollisionPointCircle(mousePos, bob1, BALL_RADIUS))
+                {
+                    dragTarget = DRAG_PHI1;
+                }
+                else
+                {
+                    dragTarget = DRAG_NONE;
+                }
+            }
+
+            if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT))
+            {
+                dragTarget = DRAG_NONE;
+            }
+
+            if (IsMouseButtonDown(MOUSE_BUTTON_LEFT))
+            {
+                if (dragTarget == DRAG_PHI1)
+                {
+                    phi1 = atan2f(mousePos.x - originPivot.x, mousePos.y - originPivot.y);
+                    phi1_d = 0;
+                    phi2_d = 0;
+                }
+                else if (dragTarget == DRAG_PHI2)
+                {
+                    pivot1 = getPivot(phi1, l1, originPivot);
+                    phi2 = atan2f(mousePos.x - pivot1.x, mousePos.y - pivot1.y);
+                    phi1_d = 0;
+                    phi2_d = 0;
+                }
+            }
+        }
+
+        if (isRunning)
+        {
+            float dt = (GetFrameTime() * TIME_SCALE) / PHYSICS_SUBSTEPS;
+
+            for (int i = 0; i < PHYSICS_SUBSTEPS; i++)
+            {
+                step(dt);
+            }
         }
 
         BeginDrawing();
-
-        drawDoublePendulum(phi1, phi2, l1, l2, (Vector2){WIDTH / 2, 0});
-
         ClearBackground(BLACK);
+
+        drawDoublePendulum(phi1, phi2, l1, l2, originPivot);
+
         EndDrawing();
     }
 

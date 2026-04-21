@@ -1,10 +1,16 @@
-# Double Pendulum Simulation in c
+# Double Pendulum Simulation in C
 
 ## Overview
 
 This project simulates a double pendulum, using differential equations to model the system's angular momentum over time, and renders the motion in real time with raylib.
 
 ![Showcase](https://github.com/lassedtu/c-double-pendulum/blob/main/images/showcase.gif?raw=true)
+
+## Controls
+
+- Press `Space` to start or pause the simulation.
+- While paused, click and drag either pendulum to set a new angle.
+- Release the mouse, then press `Space` again to continue from the new position.
 
 # raylib C setup
 
