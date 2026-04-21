@@ -36,6 +36,23 @@ sudo apt update
 sudo apt install -y build-essential clang pkg-config libraylib-dev
 ```
 
+### Linux (Fedora / RHEL / Rocky / AlmaLinux)
+
+1. Install compiler, make, pkg-config, and raylib development files:
+
+```bash
+sudo dnf install -y gcc clang make pkgconf-pkg-config raylib-devel
+```
+
+2. Build and run:
+
+```bash
+make
+make run
+```
+
+If `raylib-devel` is not available in your enabled repositories (common on some RHEL-based setups), enable EPEL/extra repos for your distribution or install raylib from source first.
+
 ### Windows
 
 The easiest path is WSL2 with Ubuntu.
