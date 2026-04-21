@@ -17,7 +17,7 @@ all: $(TARGET)
 
 $(TARGET): $(SRC)
 	mkdir -p $(OUT_DIR)
-	$(CC) $(CFLAGS) $(SRC) -o $(TARGET) $(RAYLIB_CFLAGS) $(RAYLIB_LIBS)
+	$(CC) $(CFLAGS) $(SRC) -o $(TARGET) $(RAYLIB_CFLAGS) $(RAYLIB_LIBS) -lm
 
 run: $(TARGET)
 	$(TARGET)
