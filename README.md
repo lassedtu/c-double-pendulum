@@ -4,6 +4,8 @@
 
 This project simulates a double pendulum, using differential equations to model the system's angular momentum over time, and renders the motion in real time with raylib.
 
+[Showcase]: https://github.com/lassedtu/c-double-pendulum/images/showcase.gif "Gif showing the double pendulum simulation"
+
 # raylib C setup
 
 ## Installation by operating system
